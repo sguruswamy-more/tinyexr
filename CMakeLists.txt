@@ -2,6 +2,11 @@
 # Not usable for your cmake app.
 cmake_minimum_required(VERSION 3.5)
 
+project(
+  tinyexr
+  VERSION 1.0.0
+  LANGUAGES CXX C
+)
 set(BUILD_TARGET "tinyexr")
 set(SAMPLE_TARGET "test_tinyexr")
 
@@ -23,6 +28,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+# ---- Add dependencies via CPM ----
+# see https://github.com/TheLartians/CPM.cmake for more info
+
+include(cmake/CPM.cmake)
+# PackageProject.cmake will be used to make our target installable
+CPMAddPackage("gh:sguruswamy-more/PackageProject.cmake@1.8.1")
+
 set(TINYEXR_SOURCES
     ${PROJECT_SOURCE_DIR}/tinyexr.cc
     )
@@ -33,6 +45,16 @@ if(TINYEXR_USE_MINIZ)
   target_include_directories(miniz PUBLIC deps/miniz)
   set_target_properties(miniz PROPERTIES FOLDER "deps")
   list(APPEND TINYEXR_EXT_LIBRARIES miniz)
+
+  packageProject(
+    NAME miniz
+    VERSION 1.0.0
+    NAMESPACE miniz
+    BINARY_DIR ${PROJECT_BINARY_DIR}
+    INCLUDE_DIR ${PROJECT_SOURCE_DIR}/deps/miniz
+    INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+  )
 endif()
 
 add_library(${BUILD_TARGET} ${TINYEXR_SOURCES} ${TINYEXR_DEP_SOURCES})
@@ -76,3 +98,14 @@ if (TINYEXR_BUILD_SAMPLE)
   endif(WIN32)
 
 endif (TINYEXR_BUILD_SAMPLE)
+
+packageProject(
+    NAME ${BUILD_TARGET}
+    VERSION 1.0.0
+    NAMESPACE ${BUILD_TARGET}
+    BINARY_DIR ${PROJECT_BINARY_DIR}
+    INCLUDE_DIR ${PROJECT_SOURCE_DIR}
+    INCLUDE_DESTINATION include/${PROJECT_NAME}-${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+    DEPENDENCIES "miniz 1.0.0"
+)
