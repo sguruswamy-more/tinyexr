@@ -42,7 +42,11 @@ set(TINYEXR_SOURCES
 if(TINYEXR_USE_MINIZ)
   enable_language(C)
   add_library(miniz STATIC deps/miniz/miniz.c)
-  target_include_directories(miniz PUBLIC deps/miniz)
+  target_include_directories(
+    miniz 
+    PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/deps/miniz>
+           $<INSTALL_INTERFACE:include/miniz-v1.0.0>
+  )
   set_target_properties(miniz PROPERTIES FOLDER "deps")
   list(APPEND TINYEXR_EXT_LIBRARIES miniz)
 
