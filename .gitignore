@@ -1,2 +1,4 @@
 output.exr
 test_tinyexr
+build
+.vscode
