@@ -11,7 +11,6 @@ project(tinyexr
 # ============================================================================
 option(TINYEXR_BUILD_SAMPLE "Build sample/test executable" ON)
 option(TINYEXR_USE_MINIZ "Use bundled miniz for compression" ON)
-# option(TINYEXR_INSTALL "Generate installation target" ON)
 
 # ============================================================================
 # Build miniz dependency (optional)
@@ -112,63 +111,60 @@ endif()
 # ============================================================================
 # Installation
 # ============================================================================
-# if(TINYEXR_INSTALL)
-
 include(GNUInstallDirs)
-  include(CMakePackageConfigHelpers)
-  
-  # Install library targets
-  install(TARGETS tinyexr
+include(CMakePackageConfigHelpers)
+
+# Install library targets
+install(TARGETS tinyexr
+  EXPORT tinyexrTargets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Install miniz if used
+if(TINYEXR_USE_MINIZ)
+  install(TARGETS miniz
     EXPORT tinyexrTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   )
-  
-  # Install miniz if used
-  if(TINYEXR_USE_MINIZ)
-    install(TARGETS miniz
-      EXPORT tinyexrTargets
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    )
-    install(FILES deps/miniz/miniz.h
-      DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    )
-  endif()
-  
-  # Install headers
-  install(FILES tinyexr.h
+  install(FILES deps/miniz/miniz.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   )
-  
-  # Export targets
-  install(EXPORT tinyexrTargets
-    FILE tinyexrTargets.cmake
-    NAMESPACE tinyexr::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/tinyexr
-  )
-  
-  # Create config-version file
-  write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/tinyexrConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-  )
-  
-  # Create config file
-  configure_package_config_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tinyexrConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/tinyexrConfig.cmake"
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/tinyexr
-  )
-  
-  # Install config files
-  install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/tinyexrConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/tinyexrConfigVersion.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/tinyexr
-  )
-# endif()
+endif()
+
+# Install headers
+install(FILES tinyexr.h
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Export targets
+install(EXPORT tinyexrTargets
+  FILE tinyexrTargets.cmake
+  NAMESPACE tinyexr::
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/tinyexr
+)
+
+# Create config-version file
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/tinyexrConfigVersion.cmake"
+  VERSION ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion
+)
+
+# Create config file
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/tinyexrConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/tinyexrConfig.cmake"
+  INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/tinyexr
+)
+
+# Install config files
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/tinyexrConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/tinyexrConfigVersion.cmake"
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/tinyexr
+)
